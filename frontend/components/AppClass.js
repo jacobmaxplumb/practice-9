@@ -49,17 +49,15 @@ export default class PracticeClass extends React.Component {
   }
 
   render() {
-    const { className } = this.props
     const { feedback, email, moves, playerIndex } = this.state
-    const [x, y] = [0, 0] // this.getXY()
 
     return (
-      <div id="wrapper" className={className}>
+      <div id="wrapper" className='class-based'>
         
         <div className="info">
           <h3 id="coordinates">{}</h3>
           <h3 id="steps">
-            You have moved {moves} time{moves === 1 ? '' : 's'}.
+            You have moved 0 time{0 === 1 ? '' : 's'}.
           </h3>
         </div>
 
@@ -68,9 +66,9 @@ export default class PracticeClass extends React.Component {
             [0, 1, 2, 3, 4, 5, 6, 7, 8].map(idx => (
               <div
                 key={idx}
-                className={`square${idx === playerIndex ? ' active' : ''}`}
+                className={`square${idx === 0 ? ' active' : ''}`}
               >
-                {idx === playerIndex ? 'X' : null}
+                {idx === 0 ? 'X' : null}
               </div>
             ))
           }
@@ -78,7 +76,7 @@ export default class PracticeClass extends React.Component {
 
         {/* ID is still #message but we call it "feedback" in our state */}
         <div className="info">
-          <h3 id="message">{feedback}</h3>
+          <h3 id="message"></h3>
         </div>
 
         <div id="keypad">
@@ -94,7 +92,7 @@ export default class PracticeClass extends React.Component {
             id="email"
             type="email"
             placeholder="Enter your email"
-            value={email}
+            value=""
             onChange={this.handleInputChange}
           />
           <input id="submit" type="submit" />
