@@ -1,3 +1,4 @@
+import axios from 'axios'
 import React from 'react'
 
 // Initial values
@@ -19,25 +20,50 @@ export default class PracticeClass extends React.Component {
     this.state = initialState
   }
 
-  // Calculate [x, y] based on the current playerIndex
   getXY = () => {
-  }
-
-  // Return "Location (x, y)" instead of "Coordinates (x, y)"
-  getLocationMessage = () => {
+    const x = this.state.playerIndex % 3;
+    const y = Math.floor(this.state.playerIndex / 3);
+    return [x, y];
   }
 
   // Reset state to all initial values
   resetState = () => {
-  }
-
-  // Calculate the next index based on direction
-  calculateNextIndex = (direction) => {
-    
+    this.setState(initialState)
   }
 
   // Handle movement button clicks
   handleMove = (evt) => {
+    const { id } = evt.target;
+    switch(id) {
+      case 'up':
+        if (this.state.playerIndex < 3) {
+          this.setState({ feedback: 'You cannot move up!' });
+        } else {
+          this.setState({ playerIndex: this.state.playerIndex - 3, moves: this.state.moves + 1, feedback: ''});
+        }
+        break;
+      case 'down':
+        if (this.state.playerIndex > 5) {
+          this.setState({ feedback: 'You cannot move down!' });
+        } else {
+          this.setState({ playerIndex: this.state.playerIndex + 3, moves: this.state.moves + 1, feedback: ''});
+        }
+        break;
+      case 'left':
+        if (this.state.playerIndex % 3 === 0) {
+          this.setState({ feedback: 'You cannot move left!' });
+        } else {
+          this.setState({ playerIndex: this.state.playerIndex - 1, moves: this.state.moves + 1, feedback: ''});
+        }
+        break;
+      case 'right':
+        if (this.state.playerIndex % 3 === 2) {
+          this.setState({ feedback: 'You cannot move right!' });
+        } else {
+          this.setState({ playerIndex: this.state.playerIndex + 1, moves: this.state.moves + 1, feedback: ''});
+        }
+        break;
+    }
   }
 
   // Handle email input changes
@@ -45,19 +71,22 @@ export default class PracticeClass extends React.Component {
   }
 
   // Pretend to submit form data
-  handleSubmit = (evt) => {
+  handleSubmit = async (evt) => {
+    evt.preventDefault()
+    const [x, y] = this.getXY();
+    const body = {x: x+1, y: y+1, steps: this.state.moves, email: this.state.email}
+    const {data} = await axios.post('http://localhost:9000/api/result', body);
+    this.setState({ feedback: data.message });
   }
 
   render() {
-    const { feedback, email, moves, playerIndex } = this.state
-
     return (
       <div id="wrapper" className='class-based'>
         
         <div className="info">
           <h3 id="coordinates">{}</h3>
           <h3 id="steps">
-            You have moved 0 time{0 === 1 ? '' : 's'}.
+            You have moved {this.state.moves} time{this.state.moves === 1 ? '' : 's'}.
           </h3>
         </div>
 
@@ -66,9 +95,9 @@ export default class PracticeClass extends React.Component {
             [0, 1, 2, 3, 4, 5, 6, 7, 8].map(idx => (
               <div
                 key={idx}
-                className={`square${idx === 0 ? ' active' : ''}`}
+                className={`square${idx === this.state.playerIndex ? ' active' : ''}`}
               >
-                {idx === 0 ? 'X' : null}
+                {idx === this.state.playerIndex ? 'X' : null}
               </div>
             ))
           }
@@ -76,7 +105,7 @@ export default class PracticeClass extends React.Component {
 
         {/* ID is still #message but we call it "feedback" in our state */}
         <div className="info">
-          <h3 id="message"></h3>
+          <h3 id="message">{this.state.feedback}</h3>
         </div>
 
         <div id="keypad">
@@ -92,8 +121,8 @@ export default class PracticeClass extends React.Component {
             id="email"
             type="email"
             placeholder="Enter your email"
-            value=""
-            onChange={this.handleInputChange}
+            value={this.state.email}
+            onChange={e => this.setState({ email: e.target.value })}
           />
           <input id="submit" type="submit" />
         </form>
